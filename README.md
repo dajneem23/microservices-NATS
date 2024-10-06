@@ -35,6 +35,7 @@ Communication Flow
 	•	Example: The Notification Service requests user details from the Auth Service before sending a personalized notification.
 
 Project Folder Tree
+```
 microservices-nats/
 ├── nats-server/
 │   ├── Dockerfile
@@ -94,3 +95,4 @@ microservices-nats/
 │       └── README.md
 ├── docker-compose.yml
 └── README.md
+```
