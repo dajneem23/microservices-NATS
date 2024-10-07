@@ -1,0 +1,3 @@
+[submodule "nodejs-services"]
+	path = nodejs-services
+	url = git@github.com:dajneem23/nodejs-services.git

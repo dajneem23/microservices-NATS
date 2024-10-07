@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  nats-server:
+    image: nats:latest
+    container_name: nats-server
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    volumes:
+      - ./nats-server/nats.conf:/etc/nats/nats.conf
+    command: ["-c", "/etc/nats/nats.conf"]
+
+  auth-service:
+    build:
+      context: ./nodejs-services/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+      - "50051:50051"
+    environment:
+      - NATS_URL=nats://nats-server:4222
+      - GRPC_SERVER_URL=0.0.0.0:50051
+    depends_on:
+      - nats-server
+
+  notification-service:
+    build:
+      context: ./nodejs-services/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "3002:3002"
+      - "50052:50052"
+    environment:
+      - NATS_URL=nats://nats-server:4222
+      - GRPC_SERVER_URL=0.0.0.0:50052
+    depends_on:
+      - nats-server
+
+  data-processing-service:
+    build:
+      context: ./rust-services/data-processing-service
+      dockerfile: Dockerfile
+    container_name: data-processing-service
+    ports:
+      - "3003:3003"
+      - "50053:50053"
+    environment:
+      - NATS_URL=nats://nats-server:4222
+      - GRPC_SERVER_URL=0.0.0.0:50053
+    depends_on:
+      - nats-server
+
+  analytics-service:
+    build:
+      context: ./rust-services/analytics-service
+      dockerfile: Dockerfile
+    container_name: analytics-service
+    ports:
+      - "3004:3004"
+      - "50054:50054"
+    environment:
+      - NATS_URL=nats://nats-server:4222
+      - GRPC_SERVER_URL=0.0.0.0:50054
+    depends_on:
+      - nats-server
+
+networks:
+  default:
+    name: nats-microservices-network
